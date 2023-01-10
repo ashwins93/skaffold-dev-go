@@ -1,0 +1,29 @@
+apiVersion: skaffold/v4beta1
+kind: Config
+build:
+  artifacts:
+    - image: skaffold-example
+      context: .
+deploy:
+  helm:
+    releases:
+      - name: skaffold-example
+        chartPath: helm
+        valuesFiles:
+          - helm/values.yaml
+        setValueTemplates:
+          image.repository: "{{.IMAGE_REPO_skaffold_example}}"
+          image.tag: "{{.IMAGE_TAG_skaffold_example}}"
+
+profiles:
+  - name: dev
+    activation:
+      - command: dev
+    build:
+      artifacts:
+        - image: skaffold-example
+          context: .
+          sync:
+            manual:
+              - src: "main.go"
+                dest: "."
